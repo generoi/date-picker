@@ -27,6 +27,7 @@ import {
   createIdentifier,
   DaysOfWeek,
   createDate,
+  isEqualMonth,
 } from "./date-utils"
 import { DatePickerInput } from "./date-picker-input"
 import { DatePickerMonth } from "./date-picker-month"
@@ -481,12 +482,8 @@ export class DuetDatePicker implements ComponentInterface {
       return
     }
 
-    if (day.getMonth() === this.focusedDay.getMonth()) {
-      this.setValue(day)
-      this.hide()
-    } else {
-      this.setFocusedDay(day)
-    }
+    this.setValue(day)
+    this.hide()
   }
 
   private handleMonthSelect = e => {
@@ -524,6 +521,14 @@ export class DuetDatePicker implements ComponentInterface {
     if (this.activeFocus && this.open) {
       setTimeout(() => element.focus(), 0)
     }
+  }
+
+  private isDateDisabled = (date: Date): boolean => {
+    if (this.dateAdapter.isDateDisabled) {
+      return this.dateAdapter.isDateDisabled(date, this.focusedDay)
+    }
+
+    return !isEqualMonth(date, this.focusedDay)
   }
 
   /**
@@ -735,6 +740,7 @@ export class DuetDatePicker implements ComponentInterface {
                 focusedDayRef={this.processFocusedDayNode}
                 min={minDate}
                 max={maxDate}
+                isDateDisabled={this.isDateDisabled}
               />
             </div>
           </div>
